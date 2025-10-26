@@ -2,21 +2,25 @@
 function saveOptions(e) {
   let maxTabs = document.getElementById("max-tabs").value;
   let includePinned = document.getElementById("include-pinned").checked;
+  let currentWindow = document.getElementById("current-window").checked;
   browser.storage.sync.set({
     maxTabs: maxTabs,
-    includePinned: includePinned
+    includePinned: includePinned,
+    currentWindow: currentWindow,
   });
   e.preventDefault();
 }
 
 function restoreOptions() {
-  var gettingItem = browser.storage.sync.get({
+  let gettingItem = browser.storage.sync.get({
     maxTabs: 10,
-    includePinned: false
+    includePinned: false,
+    currentWindow: true
   });
   gettingItem.then((res) => {
     document.getElementById("max-tabs").value = res.maxTabs;
     document.getElementById("include-pinned").checked = res.includePinned;
+    document.getElementById("current-window").checked = res.currentWindow;
   });
 }
 

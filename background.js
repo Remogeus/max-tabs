@@ -6,16 +6,19 @@
 let title = browser.i18n.getMessage('title');
 let maxTabs = 10;
 let includePinned = false;
+let currentWindow = true;
 let colorScale = chroma.scale(['#A6A6A6', '#B90000']);
 
 function updatePrefs() {
   return new Promise((resolve, reject) => {
     browser.storage.sync.get({
       "maxTabs": 10,
-      "includePinned": false
+      "includePinned": false,
+      "useAllWindows": false
     }, items => {
       maxTabs = items.maxTabs;
       includePinned = items.includePinned;
+      currentWindow = items.useAllWindows;
       resolve();
     });
   });
@@ -34,18 +37,20 @@ function updateButton(numTabs) {
 }
 
 async function queryNumTabs() {
-  let tabs = await browser.tabs.query({
-    currentWindow: true,
-    pinned: includePinned ? null : false
-  });
+    let tabs = await browser.tabs.query({
+      currentWindow: currentWindow ? null : false,
+      pinned: includePinned ? null : false
+    });
+
   return tabs.length;
 }
 
 browser.tabs.onCreated.addListener(tab => {
-  if (browser.windows.get(tab.windowId).focused) {
-    // We only care about the current window
-    return;
-  }
+//  if (browser.windows.get(tab.windowId).focused) {
+//    // We only care about the current window
+//    return;
+  //not anymore in this fork
+//  }
   if (tab.id != browser.tabs.TAB_ID_NONE) {
     queryNumTabs().then(numTabs => {
       if (numTabs > maxTabs) {
